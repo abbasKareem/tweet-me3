@@ -17,6 +17,7 @@
       {% csrf_token %}
       <input type="hidden" value="/" name="next" />
       <textarea
+        required="required"
         class="form-control"
         name="content"
         placeholder="Your tweet..."
@@ -29,6 +30,8 @@
 <div class="row" id="tweets">loading...</div>
 
 <script>
+
+  
   function handleTweetCreateFormSubmit(event) {
     event.preventDefault();
     const myForm = event.target;
@@ -48,6 +51,9 @@
         console.log(newTweetJson.likes)
         const newTweetElement = formatTweetElement(newTweetJson);
         console.log(newTweetElement);
+        const ogHtml = tweetsContainerElement.innerHTML;
+        tweetsContainerElement.innerHTML = newTweetElement + ogHtml;
+        myForm.reset();
       }
     };
     xhr.send(myFormData);
