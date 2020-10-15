@@ -107,8 +107,7 @@
     xhr.open(method, url);
     xhr.onload = function () {
       const serverResponse = xhr.response;
-      const listedItems = serverResponse.response;
-
+      const listedItems = serverResponse; // Before Rest Framewrok we use (serverResponse.response). when using restframework (serverResponse)
       var finalTweetStr = "";
       for (var i = 0; i < listedItems.length; i++) {
         var tweetObj = listedItems[i];
