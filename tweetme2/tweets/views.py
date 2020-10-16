@@ -2,7 +2,9 @@ import random
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from rest_framework.decorators import api_view
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated
 from django.utils.http import is_safe_url
 from rest_framework.response import Response
 from .serializers import TweetSerializer
@@ -21,6 +23,8 @@ def home_view(request, *args, **kwargs):
 
 # urls('create-tweet')
 @api_view(['POST'])
+#@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
 def tweet_create_view(request, *args, **kwargs):
     serializer = TweetSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
