@@ -8,13 +8,21 @@
 
 <div class="row mb-3">
   <div class="col-md-4 mx-auto col-10">
-    <form class="form" id="tweet-create-form" method="POST" action="/create-tweet">
+    <form
+      class="form"
+      id="tweet-create-form"
+      method="POST"
+      action="/create-tweet"
+    >
       {% csrf_token %}
-      <div class="d-none alert alert-danger" id="tweet-create-form-error">
-
-      </div>
+      <div class="d-none alert alert-danger" id="tweet-create-form-error"></div>
       <input type="hidden" value="/" name="next" />
-      <textarea required="required" class="form-control" name="content" placeholder="Your tweet..."></textarea>
+      <textarea
+        required="required"
+        class="form-control"
+        name="content"
+        placeholder="Your tweet..."
+      ></textarea>
       <button type="submit" class="btn btn-primary">Tweet</button>
     </form>
   </div>
@@ -29,14 +37,11 @@
       // show error
       myErrorDiv.setAttribute("class", "d-block alert alert-danger");
       myErrorDiv.innerText = msg;
-
     } else {
       // hide error
       myErrorDiv.setAttribute("class", "d-none alert alert-danger");
-
     }
   }
-
 
   function handleTweetCreateFormSubmit(event) {
     event.preventDefault();
@@ -74,23 +79,19 @@
         } else {
           alert("An error occured. Please try again.");
         }
-
       } else if (xhr.status === 500) {
         alert("There was a server error, please try again.");
-      }
-       else if (xhr.status === 401) {
+      } else if (xhr.status === 401) {
         alert("You must login !");
         window.location.href = "/login"; //redirect to "/login url"
-      }
-       else if (xhr.status === 403) {
+      } else if (xhr.status === 403) {
         alert("You must login !");
         window.location.href = "/login";
       }
-
-    }
+    };
     xhr.onerror = function () {
       alert("An error occurred. Please try again later.");
-    }
+    };
 
     xhr.send(myFormData);
   }
@@ -127,6 +128,23 @@
 
   function handleDidLike(tweet_id, currentCount) {
     console.log(tweet_id, currentCount);
+    const url = "api/tweets/action";
+    const method = "POST";
+    data = JSON.stringify({
+      id: tweet_id,
+      action: "like",
+    });
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.onload = function(){
+      console.log(xhr.status, xhr.response); 
+    }
+    xhr.send(data);
+
+    return;
   }
 
   function LikeBtn(tweet) {

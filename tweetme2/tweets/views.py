@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated
 from django.utils.http import is_safe_url
 from rest_framework.response import Response
-from .serializers import TweetSerializer
+from .serializers import TweetSerializer, TweetActionSerializer
 
 from .forms import TweetForm
 from .models import Tweet
@@ -15,13 +15,11 @@ from .models import Tweet
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 
-# urls('')
 def home_view(request, *args, **kwargs):
     return render(request, "pages/home.html", context={}, status=200)
 
 
 
-# urls('create-tweet')
 @api_view(['POST'])
 #@authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])
@@ -60,6 +58,29 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_action_view(request, *args, **kwargs):
+    """id is required, Action options are: like, unlike, retweet"""
+    serializer = TweetActionSerializer(data=request.POST)
+    if serializer.is_valid(raise_exception=True):
+        data = serializer.validated_data
+        tweet_id = data.get("id")
+        action = data.get("action")
+        qs = Tweet.objects.filter(id=tweet_id)
+        if not qs.exists():
+            return Response({}, status=404)
+        obj = qs.first()
+        if action == "like":
+            obj.likes.add(request.user)
+        elif action == "unlike":
+            obj.likes.remove(request.user)
+        elif action == "retweet":
+            pass
+    return Response({"message": "Tweet removed"}, status=200)
+
+
+
 @api_view(['GET'])
 def tweet_list_view(request, *args, **kwargs):
     qs = Tweet.objects.all()
@@ -68,7 +89,6 @@ def tweet_list_view(request, *args, **kwargs):
 
 
 
-# urls('create-tweet')
 def tweet_create_view_pure_django(request, *args, **kwargs):
     user = request.user
     if not request.user.is_authenticated:
@@ -76,7 +96,6 @@ def tweet_create_view_pure_django(request, *args, **kwargs):
         if request.is_ajax():
             return JsonResponse({}, status=401)
         return redirect(settings.LOGIN_URL)
-
     form = TweetForm(request.POST or None)
     next_url = request.POST.get("next") or None
     if form.is_valid():
@@ -95,7 +114,6 @@ def tweet_create_view_pure_django(request, *args, **kwargs):
 
 
 
-# urls('tweet/')
 def tweet_list_view_pure_django(request, *args, **kwargs):
     qs = Tweet.objects.all()
     tweets_list = [x.serialize() for x in qs]
@@ -107,7 +125,6 @@ def tweet_list_view_pure_django(request, *args, **kwargs):
 
 
 
-# urls('tweet/<int:tweet_id>')
 def tweet_detail_view_pure_django(request, tweet_id, *args, **kwargs):
     data = {
         "id": tweet_id,
