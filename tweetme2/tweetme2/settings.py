@@ -131,8 +131,6 @@ if DEBUG:
         'rest_framework.renderers.BrowsableAPIRenderer',
     ]
 
-
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication'
